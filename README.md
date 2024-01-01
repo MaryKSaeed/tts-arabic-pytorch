@@ -23,7 +23,7 @@ Multispeaker weights are available for the FastPitch model.
 Currently, another male voice and two female voices have been added.
 Audio samples can be found [here](https://nipponjo.github.io/tts-arabic-speakers). Download weights [here](https://drive.google.com/u/0/uc?id=18IYUSRXvLErVjaDORj_TKzUxs90l61Ja&export=download).
 
-The multispeaker dataset was created by synthesizing data with [Coqui]'s(https://github.com/coqui-ai) [XTTS-v2](https://huggingface.co/coqui/XTTS-v2) model and a mix of voices from the [Tunisian_MSA](https://www.openslr.org/46/) dataset.
+The multispeaker dataset was created by synthesizing data with [Coqui](https://github.com/coqui-ai)'s [XTTS-v2](https://huggingface.co/coqui/XTTS-v2) model and a mix of voices from the [Tunisian_MSA](https://www.openslr.org/46/) dataset.
 
 ## Quick Setup
 The models were trained with the mse loss as described in the papers. I also trained the models using an additional adversarial loss (adv). The difference is not large, but I think that the (adv) version often sounds a bit clearer. You can compare them yourself.
