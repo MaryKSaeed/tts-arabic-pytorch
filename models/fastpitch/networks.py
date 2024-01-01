@@ -42,15 +42,15 @@ class FastPitch(_FastPitch):
                  vowelizer: Optional[_VOWELIZER_TYPE] = None,              
                  **kwargs):
         from models.fastpitch import net_config
-        sds = torch.load(checkpoint, map_location='cpu')
-        if 'config' in sds:
-            net_config = sds['config']
+        state_dicts = torch.load(checkpoint, map_location='cpu')
+        if 'config' in state_dicts:
+            net_config = state_dicts['config']
         super().__init__(**net_config)
         #self.n_eos = len(EOS_TOKENS)
         self.arabic_in = arabic_in
 
         #if checkpoint is not None:            
-        self.load_state_dict(sds['model'])
+        self.load_state_dict(state_dicts['model'])
 
         self.config = get_basic_config()
         
@@ -58,6 +58,10 @@ class FastPitch(_FastPitch):
         if vowelizer is not None:
             self.vowelizers[vowelizer] = load_vowelizer(vowelizer, self.config)
         self.default_vowelizer = vowelizer
+
+        self.phon_to_id = None
+        if 'symbols' in state_dicts:
+            self.phon_to_id = {phon: i for i, phon in enumerate(state_dicts['symbols'])}
 
         self.eval()
    
@@ -91,7 +95,7 @@ class FastPitch(_FastPitch):
 
         tokens = self._tokenize(utterance, vowelizer=vowelizer)
 
-        token_ids = text.tokens_to_ids(tokens)
+        token_ids = text.tokens_to_ids(tokens, self.phon_to_id)
         ids_batch = torch.LongTensor(token_ids).unsqueeze(0).to(self.device)
         sid = torch.LongTensor([speaker_id]).to(self.device)
 
@@ -112,10 +116,14 @@ class FastPitch(_FastPitch):
                     vowelizer: Optional[_VOWELIZER_TYPE] = None
                     ):
 
-        batch_tokens = [self._tokenize(line, vowelizer=vowelizer) for line in batch]
+        batch_tokens = [
+            self._tokenize(line, vowelizer=vowelizer) 
+            for line in batch
+            ]
 
-        batch_ids = [torch.LongTensor(text.tokens_to_ids(tokens))
-                     for tokens in batch_tokens]
+        batch_ids = [torch.LongTensor(
+            text.tokens_to_ids(tokens, self.phon_to_id)
+            ) for tokens in batch_tokens]
 
         batch = text_collate_fn(batch_ids)
         (
