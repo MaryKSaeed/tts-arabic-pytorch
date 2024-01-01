@@ -19,7 +19,9 @@ from utils import progbar, read_lines_from_file
 
 
 def infer(args):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    use_cuda_if_available = not args.cpu
+    device = torch.device(
+        'cuda' if torch.cuda.is_available() and use_cuda_if_available else 'cpu')
 
     if args.model == 'fastpitch':
         from models.fastpitch import FastPitch2Wave
@@ -94,8 +96,7 @@ def main():
     parser.add_argument('--speed', type=float, default=1.0)
     parser.add_argument('--denoise', type=float, default=0)
     parser.add_argument('--batch_size', type=int, default=2)
-    parser.add_argument('--device', type=str,
-                        default='cuda', choices=['cuda', 'cpu'])
+    parser.add_argument('--cpu', action='store_true')
     args = parser.parse_args()
 
     infer(args)

@@ -23,11 +23,11 @@ from utils import get_basic_config
 # python test.py --model tacotron2 --checkpoint pretrained/tacotron2_ar_mse.pth --out_dir samples/test_tc2_mse
 
 
-def test(args, text_arabic):
+def test(args, text_arabic):    
 
-    
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    use_cuda_if_available = not args.cpu
+    device = torch.device(
+        'cuda' if torch.cuda.is_available() and use_cuda_if_available else 'cpu')
     out_dir = args.out_dir
     sample_rate = 22_050
 
@@ -108,6 +108,7 @@ def main():
     parser.add_argument('--denoise', type=float, default=0)  
     parser.add_argument('--out_dir', default='samples/test')
     parser.add_argument('--vowelizer', default=None)
+    parser.add_argument('--cpu', action='store_true')
 
     parser.add_argument('--do_not_play', action='store_true')   
     args = parser.parse_args()
