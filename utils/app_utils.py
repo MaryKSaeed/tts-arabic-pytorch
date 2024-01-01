@@ -28,8 +28,6 @@ def load_models():
         else:
             print(f"Model type: {model_dict['type']} not supported")
             continue
-        model.cuda()
-        model.eval()
 
         models.append((model_name, model))
     
